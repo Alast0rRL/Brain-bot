@@ -1,5 +1,6 @@
 # Импортируем необходимые библиотеки
 import telebot
+import cmath
 from telebot import types
 
 # Создаем экземпляр бота
@@ -28,6 +29,12 @@ def start_om(message):
     msg = bot.reply_to(message, "Введите сопротивление в формате:\n1 10 15 20\n1-Последовательное соединение. 2 - Паралельное\nВсе последующие числа это номинал резисторов")
     bot.register_next_step_handler(msg, process_soprotiv1_step)
 
+@bot.message_handler(commands=['Disk','disk'])
+def start_disk(message):
+    # Запрашиваем у пользователя данные и регистрируем следующий шаг
+    msg = bot.reply_to(message, "Введите уровнение в формате 2 5 -2")
+    bot.register_next_step_handler(msg, procces_disk_step)
+
 # Обработчик текстовых сообщений
 @bot.message_handler(content_types=['text'])
 def func(message):
@@ -35,8 +42,7 @@ def func(message):
     if(message.text == "Сопротивление"):
         start_om(message)
     elif(message.text == "Дискриминант"):
-        pass  # Здесь должен быть ваш код для расчета дискриминанта
-
+       start_disk(message)
 # Функция для расчета сопротивления
 def process_soprotiv1_step(message):
     try:
@@ -76,6 +82,31 @@ def check_for_restart(message):
         global R
         R=0
         bot.reply_to(message, 'GigaBrain завершил свою работу')
+
+def procces_disk_step(message):
+# Запрашиваем коэффициенты у пользователя
+    urav = message.text
+    urav_split = urav.split(" ")
+# Вычисляем дискриминант
+    D = float(urav_split[1])**2 - 4*float(urav_split[0])*float(urav_split[2])
+    msg = bot.reply_to(message,D)
+
+# Вычисляем корни
+    root1 = (-float(urav_split[1]) - cmath.sqrt(D)) / (2 * float(urav_split[0]))
+    root2 = (-float(urav_split[1]) + cmath.sqrt(D)) / (2 * float(urav_split[0]))
+
+    msg = bot.reply_to(message, root1)
+    msg = bot.reply_to(message, root2)
+
+
+
+
+
+
+
+
+
+
 
 # Запускаем бота
 bot.polling()
