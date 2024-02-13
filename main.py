@@ -15,7 +15,7 @@ R = 0
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     # Отправляем сообщение с описанием команд
-    bot.reply_to(message, "/Om-Калькулятор сопротивлений\n/Disk-Решить квадратное уравнение")
+    bot.reply_to(message, "/Om-Калькулятор сопротивлений\n/Disk-Решить квадратное уравнение\nГлавная формула")
     # Создаем клавиатуру
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     btn1 = types.KeyboardButton("Сопротивление")
