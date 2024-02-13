@@ -11,8 +11,6 @@ bot = telebot.TeleBot("6855751951:AAHALEUqgT7puSUEZ0FwubhaMdWadjoVQVs")
 R = 0
 
 
-
-
 # Обработчик командs /start
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
@@ -22,7 +20,8 @@ def send_welcome(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     btn1 = types.KeyboardButton("Сопротивление")
     btn2 = types.KeyboardButton("Дискриминант")
-    markup.add(btn1, btn2)
+    btn3 = types.KeyboardButton("Главная формула")
+    markup.add(btn1, btn2, btn3)
     # Отправляем клавиатуру пользователю
     bot.send_message(message.chat.id, "Выберите опцию", reply_markup=markup)
 
@@ -54,6 +53,8 @@ def button(message):
         start_om(message)
     elif(message.text == "Дискриминант"):
        start_disk(message)
+    elif(message.text == "Дискриминант"):
+       start_gl_form(message)
 
 
 
