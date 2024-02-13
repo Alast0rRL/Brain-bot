@@ -53,7 +53,7 @@ def button(message):
         start_om(message)
     elif(message.text == "Дискриминант"):
        start_disk(message)
-    elif(message.text == "Дискриминант"):
+    elif(message.text == "Главная формула"):
        start_gl_form(message)
 
 
