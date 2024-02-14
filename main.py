@@ -117,15 +117,15 @@ def process_f_step(message):
         if F == int(F):
             F = int(F)
         # Отправляем результат пользователю
-        bot.send_message(message.chat.id, str(R)+" Ом")
+        bot.send_message(message.chat.id, str(R)+" Фарад")
         # Запрашиваем у пользователя подтверждение для продолжения
         msg = bot.reply_to(message, "Для продолжения введите: +")
-        bot.register_next_step_handler(msg, check_for_restart)
+        bot.register_next_step_handler(msg, check_for_restart_f)
     except Exception as e:
         # Если возникла ошибка, отправляем сообщение об ошибке
         bot.reply_to(message, 'Ошибка!')
 # Функция для проверки, хочет ли пользователь продолжить
-def check_for_restart(message):
+def check_for_restart_f(message):
     if message.text == '+':
         # Если пользователь ввел '+', продолжаем расчет
         start_f(message)
