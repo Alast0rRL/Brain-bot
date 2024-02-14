@@ -130,21 +130,23 @@ def check_for_restart(message):
         bot.reply_to(message, 'GigaBrain завершил свою работу')
 # Функция для решения квадратного
 def procces_disk_step(message):
+    try:
 # Запрашиваем коэффициенты у пользователя
-    urav = message.text
-    urav_split = urav.split(" ")
+        urav = message.text
+        urav_split = urav.split(" ")
 # Вычисляем дискриминант
-    D = float(urav_split[1])**2 - 4*float(urav_split[0])*float(urav_split[2])
-    msg = bot.reply_to(message,"D="+str(D))
+        D = float(urav_split[1])**2 - 4*float(urav_split[0])*float(urav_split[2])
+        msg = bot.reply_to(message,"D="+str(D))
 
 # Вычисляем корни
-    root1 = (-float(urav_split[1]) - cmath.sqrt(D)) / (2 * float(urav_split[0]))
-    root2 = (-float(urav_split[1]) + cmath.sqrt(D)) / (2 * float(urav_split[0]))
+        root1 = (-float(urav_split[1]) - cmath.sqrt(D)) / (2 * float(urav_split[0]))
+        root2 = (-float(urav_split[1]) + cmath.sqrt(D)) / (2 * float(urav_split[0]))
 
-    msg = bot.reply_to(message, "x1="+str(root1))
-    msg = bot.reply_to(message, "x2="+str(root2))
-
-
+        msg = bot.reply_to(message, "x1="+str(root1))
+        msg = bot.reply_to(message, "x2="+str(root2))
+    except Exception as e:
+         # Если возникла ошибка, отправляем сообщение об ошибке
+         bot.reply_to(message, 'Ошибка!')
 
 
 
