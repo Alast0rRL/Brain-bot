@@ -14,9 +14,11 @@ with open(f'{filename}.json') as file:
   whitelist = json.load(file)['ids']
 
 
+
 # Создаем экземпляр бота
 bot = telebot.TeleBot("6855751951:AAHALEUqgT7puSUEZ0FwubhaMdWadjoVQVs")
 # Инициализируем переменную для хранения сопротивления
+F = 0
 R = 0
 # Обработчик командs /start
 @bot.message_handler(commands=['start', 'help'])
@@ -29,9 +31,11 @@ def send_welcome(message):
         # Создаем клавиатуру
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         btn1 = types.KeyboardButton("Сопротивление")
-        btn2 = types.KeyboardButton("Дискриминант")
-        btn3 = types.KeyboardButton("Главная формула")
-        markup.add(btn1, btn2, btn3)
+        btn2 = types.KeyboardButton("Ёмкость")
+        btn3 = types.KeyboardButton("Дискриминант")
+        btn4 = types.KeyboardButton("Главная формула")
+        btn5 = types.KeyboardButton("Перевести в СИ")
+        markup.add(btn1, btn2, btn3, btn4, btn5)
         # Отправляем клавиатуру пользователю
         bot.send_message(message.chat.id, "Выберите опцию", reply_markup=markup)
 
@@ -39,6 +43,97 @@ def send_welcome(message):
 def start_id(message):
     bot.reply_to(message, message.from_user.id)
 
+@bot.message_handler(commands=['ci','Ci','si','Si'])
+def start_ci(message):
+    if message.from_user.id not in whitelist:
+        bot.reply_to(message, "Бота купи сначало, халявы он захотел")
+    else:
+        msg = bot.reply_to(message, "Введите сообщение в формате:\n1 к г\n где 1 к-исходная величина в кило\n г-требуемая величина в гига")
+        bot.register_next_step_handler(msg, process_ci_step)
+def process_ci_step(message):
+    #try:
+    UNITS = {
+    'p': 1e-12,
+    'п': 1e-12,
+
+    'n': 1e-9,
+    'н': 1e-9,
+    'mk': 1e-6,
+    'мк': 1e-6,
+
+    'm': 1e-3,
+    'м': 1e-3,
+
+    '0': 1,
+
+    'K': 1e3,
+    'К': 1e3,
+
+    'M': 1e6,
+    'М': 1e6,
+
+    'G': 1e9,
+    'Г': 1e9,
+
+    'T': 1e12,
+    'Т': 1e12
+}
+    def result(value, from_unit,
+        to_unit): return UNITS[from_unit] * value / UNITS[to_unit]
+    info = message.text.split(" ")
+    otvet = result(float(info[0]), info[1], info[2])
+    bot.reply_to(message, format(otvet, '.25f'))
+
+    # except Exception as e:
+    #     # Если возникла ошибка, отправляем сообщение об ошибке
+    #     bot.reply_to(message, 'Ошибка!')
+
+@bot.message_handler(commands=['F','f'])
+def start_f(message):
+    if message.from_user.id not in whitelist:
+        bot.reply_to(message, "Бота купи сначало, халявы он захотел")
+    else:
+        # Запрашиваем у пользователя данные и регистрируем следующий шаг
+        msg = bot.reply_to(message, "Введите ёмкости в формате:\n1 10 15 20\n1-Последовательное соединение. 2 - Паралельное\nВсе последующие числа это номинал резисторов")
+        bot.register_next_step_handler(msg, process_f_step)
+# Функция для расчета сопротивления
+def process_f_step(message):
+    try:
+        global F
+        # Преобразуем введенные данные в список чисел
+        info = list(map(float, message.text.split()))
+        # Если первое число 1, считаем сумму сопротивлений
+        if float(info[0]) == 2:
+            r = sum(el for el in info[1:] if isinstance(el, (int, float)))
+            F += int(r)
+        # Если первое число 2, считаем обратную сумму сопротивлений
+        elif float(info[0]) == 1:
+            i = 1
+            for el in info[1:]:
+                r = info[i]
+                i += 1    
+                F += (1/r)
+        # Если R - целое число, преобразуем его в int
+        if F == int(F):
+            F = int(F)
+        # Отправляем результат пользователю
+        bot.send_message(message.chat.id, str(R)+" Ом")
+        # Запрашиваем у пользователя подтверждение для продолжения
+        msg = bot.reply_to(message, "Для продолжения введите: +")
+        bot.register_next_step_handler(msg, check_for_restart)
+    except Exception as e:
+        # Если возникла ошибка, отправляем сообщение об ошибке
+        bot.reply_to(message, 'Ошибка!')
+# Функция для проверки, хочет ли пользователь продолжить
+def check_for_restart(message):
+    if message.text == '+':
+        # Если пользователь ввел '+', продолжаем расчет
+        start_f(message)
+    else:
+        # Если пользователь ввел что-то другое, завершаем работу
+        global F
+        F=0
+        bot.reply_to(message, 'GigaBrain завершил свою работу')
 
 
 # Обработчик команды /om
@@ -180,8 +275,12 @@ def button(message):
             start_om(message)
         elif(message.text == "Дискриминант"):
             start_disk(message)
+        elif(message.text == "Ёмкость"):
+            start_f(message)            
         elif(message.text == "Главная формула"):
             start_gl_form(message)
+        elif(message.text == "Перевести в СИ"):
+            start_ci(message)
 
 
 
