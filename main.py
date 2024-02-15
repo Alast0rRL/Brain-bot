@@ -2,6 +2,8 @@
 import json
 import telebot
 import cmath
+import cv2
+import os
 from telebot import types
 from math import sqrt
 
@@ -87,6 +89,60 @@ def process_ci_step(message):
     # except Exception as e:
     #     # Если возникла ошибка, отправляем сообщение об ошибке
     #     bot.reply_to(message, 'Ошибка!')
+
+@bot.message_handler(content_types=['photo'])
+def handle_docs_photo(message):
+    try:
+        chat_id = message.chat.id
+
+        # Сохраняем фото
+        file_info = bot.get_file(message.photo[-1].file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+
+        with open('image.jpg', 'wb') as new_file:
+            new_file.write(downloaded_file)
+
+
+
+
+        # Ждем 1 минуту
+        # Чтение изображения
+        image = cv2.imread("image.jpg")
+
+        # Преобразование изображения в оттенки серого
+        gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # Инвертирование изображения
+        inverted = 255 - gray_image
+
+        # Размытие инвертированного изображения
+        blur = cv2.GaussianBlur(inverted, (21, 21), 0)
+
+        # Инвертирование размытого изображения
+        invertedblur = 255 - blur
+
+        # Создание эскиза
+        sketch = cv2.divide(gray_image, invertedblur, scale=256.0)
+
+        # Сохранение эскиза
+        cv2.imwrite("sketch_image.png", sketch)
+
+
+
+
+
+
+
+        # Отправляем фото обратно пользователю
+        img = open('sketch_image.png', 'rb')
+        bot.send_photo(chat_id, img)
+        img.close()
+
+        # Удаляем фото с компьютера
+        os.remove("image.jpg")
+        os.remove("sketch_image.png")
+    except Exception as e:
+        bot.reply_to(message, e)
 
 @bot.message_handler(commands=['F','f'])
 def start_f(message):
