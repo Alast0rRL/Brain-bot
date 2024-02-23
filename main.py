@@ -4,6 +4,7 @@ import telebot
 import cmath
 import cv2
 import os
+import qrcode
 from telebot import types
 from math import sqrt
 
@@ -143,6 +144,33 @@ def handle_docs_photo(message):
         os.remove("sketch_image.png")
     except Exception as e:
         bot.reply_to(message, e)
+
+
+@bot.message_handler(commands=['Qr','qr'])
+def start_f(message):
+    if message.from_user.id not in whitelist:
+        bot.reply_to(message, "Бота купи сначало, халявы он захотел")
+    else:
+        # Запрашиваем у пользователя данные и регистрируем следующий шаг
+        msg = bot.reply_to(message, "Отправьте текст, который вы хотите сконвертировать в QR-код")
+        bot.register_next_step_handler(msg, create_qr_code)
+
+def create_qr_code(message):
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(message.text)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill='black', back_color='white')
+    img.save('qr_code.png')
+    
+    with open('qr_code.png', 'rb') as photo:
+        bot.send_photo(message.chat.id, photo)
+    os.remove("qr_code.png")
 
 @bot.message_handler(commands=['F','f'])
 def start_f(message):
@@ -314,15 +342,6 @@ def procces_gl_form_step(message):
 # Обработчик текстовых сообщений
 @bot.message_handler(content_types=['text'])
 def button(message):
-    if '/add_id' in message.text and message.from_user.id == admin_id:
-        id = int(message.text.split()[-1])
-        add_id(id)
-        bot.reply_to(message, "id добавлен")
-        # тут ответ от бота своего пропиши, я хз что у тебя за библиотека
-    elif '/del_id' in message.text and message.from_user.id == admin_id:
-        id = int(message.text.split()[-1])
-        del_id(id)
-        bot.reply_to(message, "id удалён")
     if message.from_user.id not in whitelist:
         bot.reply_to(message, "Бота купи сначало, халявы он захотел")
     else:
@@ -337,19 +356,6 @@ def button(message):
             start_gl_form(message)
         elif(message.text == "Перевести в СИ"):
             start_ci(message)
-
-
-
-def add_id(id):
-  whitelist.append(id)
-  with open(f'{filename}.json', 'w') as file:
-    json.dump({"ids": whitelist}, file)
-
-def del_id(id):
-  whitelist.remove(id)
-  with open(f'{filename}.json', 'w') as file:
-    json.dump({"ids": whitelist}, file)
-
 
 
 
