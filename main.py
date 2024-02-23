@@ -356,7 +356,7 @@ def button(message):
             start_gl_form(message)
         elif(message.text == "Перевести в СИ"):
             start_ci(message)
-        elif(message.text == "Qr Code"):
+        elif(message.text == "QR Code"):
             start_qr(message)
 
 
