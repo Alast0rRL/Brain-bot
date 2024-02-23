@@ -38,7 +38,7 @@ def send_welcome(message):
         btn3 = types.KeyboardButton("Дискриминант")
         btn4 = types.KeyboardButton("Главная формула")
         btn5 = types.KeyboardButton("Перевести в СИ")
-        btn6 = types.KeyboardButton("Создать QR Code")
+        btn6 = types.KeyboardButton("QR Code")
         markup.add(btn1, btn2, btn3, btn4, btn5, btn6)
         # Отправляем клавиатуру пользователю
         bot.send_message(message.chat.id, "Выберите опцию", reply_markup=markup)
@@ -155,7 +155,6 @@ def start_qr(message):
         # Запрашиваем у пользователя данные и регистрируем следующий шаг
         msg = bot.reply_to(message, "Отправьте текст, который вы хотите сконвертировать в QR-код")
         bot.register_next_step_handler(msg, create_qr_code)
-
 def create_qr_code(message):
     qr = qrcode.QRCode(
         version=1,
