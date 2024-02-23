@@ -38,7 +38,8 @@ def send_welcome(message):
         btn3 = types.KeyboardButton("Дискриминант")
         btn4 = types.KeyboardButton("Главная формула")
         btn5 = types.KeyboardButton("Перевести в СИ")
-        markup.add(btn1, btn2, btn3, btn4, btn5)
+        btn6 = types.KeyboardButton("Создать QR Code")
+        markup.add(btn1, btn2, btn3, btn4, btn5, btn6)
         # Отправляем клавиатуру пользователю
         bot.send_message(message.chat.id, "Выберите опцию", reply_markup=markup)
 
@@ -147,7 +148,7 @@ def handle_docs_photo(message):
 
 
 @bot.message_handler(commands=['Qr','qr'])
-def start_f(message):
+def start_qr(message):
     if message.from_user.id not in whitelist:
         bot.reply_to(message, "Бота купи сначало, халявы он захотел")
     else:
@@ -356,6 +357,8 @@ def button(message):
             start_gl_form(message)
         elif(message.text == "Перевести в СИ"):
             start_ci(message)
+        elif(message.text == "Qr Code"):
+            start_qr(message)
 
 
 
