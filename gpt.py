@@ -1,5 +1,5 @@
 from g4f.client import Client
-input_message = input("Сообщение: ")
+from main import input_message
 client = Client()
 response = client.chat.completions.create(
     model="gpt-3.5-turbo",

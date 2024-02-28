@@ -7,7 +7,8 @@ import os
 import qrcode
 from telebot import types
 from math import sqrt
-from gpt import *
+from g4f.client import Client
+
 
 
 filename = "members"
@@ -30,8 +31,6 @@ def send_welcome(message):
     if message.from_user.id not in whitelist:
        bot.reply_to(message, "Бота купи сначало, халявы он захотел")
     else:
-        # Отправляем сообщение с описанием команд
-        bot.reply_to(message, "/Om-Калькулятор сопротивлений\n/Disk-Решить квадратное уравнение\n/gl_form - Главная формула")
         # Создаем клавиатуру
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         btn1 = types.KeyboardButton("Сопротивление")
@@ -40,6 +39,7 @@ def send_welcome(message):
         btn4 = types.KeyboardButton("Главная формула")
         btn5 = types.KeyboardButton("Перевести в СИ")
         btn6 = types.KeyboardButton("QR Code")
+        btn7 = types.KeyboardButton("GPT")
         markup.add(btn1, btn2, btn3, btn4, btn5, btn6)
         # Отправляем клавиатуру пользователю
         bot.send_message(message.chat.id, "Выберите опцию", reply_markup=markup)
@@ -53,16 +53,33 @@ def start_gpt(message):
     if message.from_user.id not in whitelist:
         bot.reply_to(message, "Бота купи сначало, халявы он захотел")
     else:
-        msg = bot.reply_to(message, "Введите соощение")
+        msg = bot.reply_to(message, "Введите сообщение")
         bot.register_next_step_handler(msg, process_gpt_step)
 
 def process_gpt_step(message):
-    try:
-        input_message = message.text
-        bot.reply_to(message, response.choices[0].message.content)
-    except Exception as e:
-        # Если возникла ошибка, отправляем сообщение об ошибке
-        bot.reply_to(message, 'Ошибка!')
+
+    input_message = message.text
+    client = Client()
+    response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "system", "content": "Вы общаетесь с AI, обученным OpenAI."},
+        {"role": "user", "content": input_message},
+    ]
+    )
+    msg = bot.reply_to(message, response.choices[0].message.content)
+    bot.register_next_step_handler(msg, check_gpt_restart)
+
+def check_gpt_restart(message):
+    if message.text == ' ':
+        bot.reply_to(message, 'Giga GPT завершил свою работу')
+        
+    if message.text == '-':
+        bot.reply_to(message, 'Giga GPT завершил свою работу')
+        send_welcome(message)
+    else:
+        process_gpt_step(message)
+
 
 @bot.message_handler(commands=['ci','Ci','si','Si'])
 def start_ci(message):
@@ -101,13 +118,14 @@ def process_ci_step(message):
 }
     def result(value, from_unit,
         to_unit): return UNITS[from_unit] * value / UNITS[to_unit]
-    info = message.text.split(" ")
-    otvet = result(float(info[0]), info[1], info[2])
-    bot.reply_to(message, format(otvet, '.25f'))
+    try:
+        info = message.text.split(" ")
+        otvet = result(float(info[0]), info[1], info[2])
+        bot.reply_to(message, format(otvet, '.25f'))
 
-    # except Exception as e:
-    #     # Если возникла ошибка, отправляем сообщение об ошибке
-    #     bot.reply_to(message, 'Ошибка!')
+    except Exception as e:
+        # Если возникла ошибка, отправляем сообщение об ошибке
+        bot.reply_to(message, 'Ошибка!')
 
 @bot.message_handler(content_types=['photo'])
 def handle_docs_photo(message):
@@ -375,6 +393,8 @@ def button(message):
             start_ci(message)
         elif(message.text == "QR Code"):
             start_qr(message)
+        elif(message.text == "GPT"):
+            start_gpt(message)
 
 
 
