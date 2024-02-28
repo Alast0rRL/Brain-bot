@@ -7,6 +7,7 @@ import os
 import qrcode
 from telebot import types
 from math import sqrt
+from gpt import *
 
 
 filename = "members"
@@ -46,6 +47,22 @@ def send_welcome(message):
 @bot.message_handler(commands=['Id','id'])
 def start_id(message):
     bot.reply_to(message, message.from_user.id)
+
+@bot.message_handler(commands=['GPT','Gpt','gpt'])
+def start_gpt(message):
+    if message.from_user.id not in whitelist:
+        bot.reply_to(message, "Бота купи сначало, халявы он захотел")
+    else:
+        msg = bot.reply_to(message, "Введите соощение")
+        bot.register_next_step_handler(msg, process_gpt_step)
+
+def process_gpt_step(message):
+    try:
+        input_message = message.text
+        bot.reply_to(message, response.choices[0].message.content)
+    except Exception as e:
+        # Если возникла ошибка, отправляем сообщение об ошибке
+        bot.reply_to(message, 'Ошибка!')
 
 @bot.message_handler(commands=['ci','Ci','si','Si'])
 def start_ci(message):
