@@ -55,6 +55,7 @@ def start_gpt(message):
     else:
         msg = bot.reply_to(message, "Введите сообщение")
         bot.register_next_step_handler(msg, process_gpt_step)
+        bot.reply_to(message, "Giga GPT печатает...")
 
 def process_gpt_step(message):
 
