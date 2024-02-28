@@ -40,7 +40,7 @@ def send_welcome(message):
         btn5 = types.KeyboardButton("Перевести в СИ")
         btn6 = types.KeyboardButton("QR Code")
         btn7 = types.KeyboardButton("GPT")
-        markup.add(btn1, btn2, btn3, btn4, btn5, btn6)
+        markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7)
         # Отправляем клавиатуру пользователю
         bot.send_message(message.chat.id, "Выберите опцию", reply_markup=markup)
 
