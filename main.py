@@ -65,12 +65,14 @@ def start_gpt3(message):
 def process_gpt3_step(message):
     input_message = message.text
     response = openai.Completion.create(
-        engine="text-davinci-003",  # Выберите движок, например, "text-davinci-003"
+        model="text-davinci-003",  # Выберите модель, например, "text-davinci-003"
         prompt=input_message,
         max_tokens=150  # Максимальное количество токенов в ответе
     )
-    msg = bot.reply_to(message, response['choices'][0]['text'].strip())
+    generated_text = response.choices[0].text.strip()
+    msg = bot.reply_to(message, generated_text)
     bot.register_next_step_handler(msg, check_gpt3_restart)
+
 
 
 def check_gpt3_restart(message):
