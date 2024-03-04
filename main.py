@@ -10,8 +10,7 @@ from math import sqrt
 from g4f.client import Client
 import openai
 
-openai.api_key = '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'
-
+openai.api_key = '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'
 
 
 
