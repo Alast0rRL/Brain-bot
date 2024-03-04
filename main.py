@@ -69,8 +69,9 @@ def process_gpt3_step(message):
         prompt=input_message,
         max_tokens=150  # Максимальное количество токенов в ответе
     )
-    msg = bot.reply_to(message, response.choices[0].text.strip())
+    msg = bot.reply_to(message, response['choices'][0]['text'].strip())
     bot.register_next_step_handler(msg, check_gpt3_restart)
+
 
 def check_gpt3_restart(message):
     if message.text == ' ':
