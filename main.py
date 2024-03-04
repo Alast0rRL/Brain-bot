@@ -22,7 +22,7 @@ with open(f'{filename}.json') as file:
 
 
 # Создаем экземпляр бота
-bot = telebot.TeleBot("6737399651:AAEEKGEQhjhf7wh1ixeAd9jm71MP4Q5hjP8")
+bot = telebot.TeleBot("6855751951:AAHALEUqgT7puSUEZ0FwubhaMdWadjoVQVs")
 # Инициализируем переменную для хранения сопротивления
 F = 0
 R = 0
