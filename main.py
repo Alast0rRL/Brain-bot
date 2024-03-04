@@ -63,14 +63,16 @@ def start_gpt3(message):
 
 def process_gpt3_step(message):
     input_message = message.text
-    response = openai.Completion.create(
-        model="text-davinci-003",  # Выберите модель, например, "text-davinci-003"
-        prompt=input_message,
-        max_tokens=150  # Максимальное количество токенов в ответе
+    client = Client()
+    response = client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "Вы общаетесь с AI, обученным OpenAI."},
+        {"role": "user", "content": input_message},
+    ]
     )
-    generated_text = response.choices[0].text.strip()
-    msg = bot.reply_to(message, generated_text)
-    bot.register_next_step_handler(msg, check_gpt3_restart)
+    msg = bot.reply_to(message, response.choices[0].message.content)
+    bot.register_next_step_handler(msg, check_gpt_restart)
 
 
 
