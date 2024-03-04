@@ -8,6 +8,11 @@ import qrcode
 from telebot import types
 from math import sqrt
 from g4f.client import Client
+import openai
+
+openai.api_key = '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'
+
+
 
 
 
@@ -39,8 +44,9 @@ def send_welcome(message):
         btn4 = types.KeyboardButton("Главная формула")
         btn5 = types.KeyboardButton("Перевести в СИ")
         btn6 = types.KeyboardButton("QR Code")
-        btn7 = types.KeyboardButton("GPT")
-        markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7)
+        btn7 = types.KeyboardButton("GPT 3.5(fast)")
+        btn8 = types.KeyboardButton("GPT 4(slow)")
+        markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8)
         # Отправляем клавиатуру пользователю
         bot.send_message(message.chat.id, "Выберите опцию", reply_markup=markup)
 
@@ -48,7 +54,36 @@ def send_welcome(message):
 def start_id(message):
     bot.reply_to(message, message.from_user.id)
 
-@bot.message_handler(commands=['GPT','Gpt','gpt'])
+@bot.message_handler(commands=['GPT3.5', 'gpt3.5'])
+def start_gpt3(message):
+    if message.from_user.id not in whitelist:
+        bot.reply_to(message, "Бота купи сначала, халявы он захотел")
+    else:
+        msg = bot.reply_to(message, "Введите сообщение для GPT-3.5")
+        bot.register_next_step_handler(msg, process_gpt3_step)
+
+def process_gpt3_step(message):
+    input_message = message.text
+    response = openai.Completion.create(
+        engine="text-davinci-003",  # Выберите движок, например, "text-davinci-003"
+        prompt=input_message,
+        max_tokens=150  # Максимальное количество токенов в ответе
+    )
+    msg = bot.reply_to(message, response.choices[0].text.strip())
+    bot.register_next_step_handler(msg, check_gpt3_restart)
+
+def check_gpt3_restart(message):
+    if message.text == ' ':
+        bot.reply_to(message, 'GPT-3.5 завершил свою работу')
+        
+    if message.text == '-':
+        bot.reply_to(message, 'GPT-3.5 завершил свою работу')
+        send_welcome(message)
+    else:
+        process_gpt3_step(message)
+
+
+@bot.message_handler(commands=['GPT4','Gpt4','gpt4'])
 def start_gpt(message):
     if message.from_user.id not in whitelist:
         bot.reply_to(message, "Бота купи сначало, халявы он захотел")
@@ -392,7 +427,9 @@ def button(message):
             start_ci(message)
         elif(message.text == "QR Code"):
             start_qr(message)
-        elif(message.text == "GPT"):
+        elif(message.text == "GPT 3.5(fast)"):
+            start_gpt3(message)
+        elif(message.text == "GPT 4(slow)"):
             start_gpt(message)
 
 
